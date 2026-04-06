@@ -3,9 +3,376 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý Sản phẩm</title>
+  <title>UET Inventory Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-soft: rgba(37, 99, 235, 0.1);
+      --border: #e2e8f0;
+      --error: #ef4444;
+      --success: #10b981;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-dark);
+      padding: 40px 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Header Section */
+    .header {
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-dark);
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Card Wrapper */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      margin-bottom: 24px;
+    }
+
+    .section-card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Form Layout */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr 0.8fr auto;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+
+    .input-group input {
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--text-dark);
+      transition: all 0.2s ease;
+      background: #fcfcfd;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px var(--primary-soft);
+    }
+
+    #btn-add {
+      height: 46px;
+      padding: 0 24px;
+      margin-top: 24px; /* Align with inputs */
+      background: var(--text-dark);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    #btn-add:hover {
+      background: #334155;
+      transform: translateY(-1px);
+    }
+
+    /* Error Styling */
+    .error-msg {
+      color: var(--error);
+      font-size: 11px;
+      font-weight: 500;
+      margin-top: 4px;
+      height: 14px;
+    }
+
+    /* Table Styling */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th.sortable:hover {
+      color: var(--primary);
+    }
+
+    td {
+      padding: 16px;
+      font-size: 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text-dark);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .price-cell {
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .badge-qty {
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      #btn-add { grid-column: span 2; }
+    }
+  </style>
 </head>
 <body>
 
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Hệ thống Quản lý UET</h1>
+        <p>Kiểm soát tồn kho và danh mục hàng hóa chuyên nghiệp</p>
+      </div>
+    </div>
+
+    <section class="section-card">
+      <h2>Thêm sản phẩm mới</h2>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>TÊN SẢN PHẨM</label>
+          <input type="text" id="input-name" placeholder="Nhập tên sản phẩm...">
+          <div class="error-msg" id="error-name"></div>
+        </div>
+        <div class="input-group">
+          <label>DANH MỤC</label>
+          <input type="text" id="input-category" placeholder="Phân loại...">
+          <div class="error-msg"></div> </div>
+        <div class="input-group">
+          <label>ĐƠN GIÁ (VNĐ)</label>
+          <input type="number" id="input-price" placeholder="0">
+          <div class="error-msg" id="error-price"></div>
+        </div>
+        <div class="input-group">
+          <label>SỐ LƯỢNG</label>
+          <input type="number" id="input-quantity" placeholder="0">
+          <div class="error-msg" id="error-quantity"></div>
+        </div>
+        <button id="btn-add">Thêm vào kho</button>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>Danh sách hàng hóa</h2>
+      <div class="table-container">
+        <table id="product-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">STT</th>
+              <th class="sortable" id="th-name">Sản phẩm ↕</th>
+              <th>Danh mục</th>
+              <th>Đơn giá</th>
+              <th>Tồn kho</th>
+            </tr>
+          </thead>
+          <tbody>
+            </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // === Dữ liệu gốc giữ nguyên logic của bạn ===
+    var products = [];
+    var sortAsc = true;
+
+    // === Render bảng ===
+    function renderTable() {
+      var tbody = document.querySelector('#product-table tbody');
+      tbody.innerHTML = '';
+      for (var i = 0; i < products.length; i++) {
+        var p = products[i];
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + (i + 1) + '</td>' +
+          '<td style="font-weight:600">' + escapeHtml(p.name) + '</td>' +
+          '<td style="color: #64748b">' + escapeHtml(p.category) + '</td>' +
+          '<td class="price-cell">' + formatPrice(p.price) + '</td>' +
+          '<td><span class="badge-qty">' + p.quantity + '</span></td>';
+        tbody.appendChild(tr);
+      }
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatPrice(price) {
+      return Number(price).toLocaleString('vi-VN') + ' ₫';
+    }
+
+    // === Load AJAX ===
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        products = JSON.parse(xhr.responseText);
+        renderTable();
+      }
+    };
+    xhr.open('GET', 'products.json');
+    xhr.send();
+
+    // === Sắp xếp ===
+    var thName = document.getElementById('th-name');
+    thName.addEventListener('click', function() {
+      products.sort(function(a, b) {
+        var nameA = a.name.toLowerCase();
+        var nameB = b.name.toLowerCase();
+        if (nameA < nameB) return sortAsc ? -1 : 1;
+        if (nameA > nameB) return sortAsc ? 1 : -1;
+        return 0;
+      });
+      thName.innerHTML = 'Sản phẩm ' + (sortAsc ? '▲' : '▼');
+      sortAsc = !sortAsc;
+      renderTable();
+    });
+
+    // === Xử lý thêm sản phẩm ===
+    document.getElementById('btn-add').addEventListener('click', function() {
+      var nameInput = document.getElementById('input-name');
+      var categoryInput = document.getElementById('input-category');
+      var priceInput = document.getElementById('input-price');
+      var quantityInput = document.getElementById('input-quantity');
+
+      var name = nameInput.value.trim();
+      var category = categoryInput.value.trim();
+      var price = parseFloat(priceInput.value);
+      var quantity = parseInt(quantityInput.value, 10);
+
+      var valid = true;
+      var errorName = document.getElementById('error-name');
+      var errorPrice = document.getElementById('error-price');
+      var errorQuantity = document.getElementById('error-quantity');
+
+      // Reset errors
+      errorName.textContent = '';
+      errorPrice.textContent = '';
+      errorQuantity.textContent = '';
+
+      if (!name || name.length < 3) {
+        errorName.textContent = 'Tên tối thiểu 3 ký tự';
+        valid = false;
+      }
+      if (isNaN(price) || price <= 0) {
+        errorPrice.textContent = 'Giá phải > 0';
+        valid = false;
+      }
+      if (isNaN(quantity) || quantity < 1 || !Number.isInteger(quantity)) {
+        errorQuantity.textContent = 'SL phải ≥ 1';
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      // Thêm vào mảng
+      products.push({
+        id: products.length + 1,
+        name: name,
+        category: category || 'Chưa phân loại',
+        price: price,
+        quantity: quantity
+      });
+
+      renderTable();
+
+      // Reset Form
+      nameInput.value = '';
+      categoryInput.value = '';
+      priceInput.value = '';
+      quantityInput.value = '';
+    });
+  </script>
 </body>
 </html>
